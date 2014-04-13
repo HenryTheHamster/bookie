@@ -35,7 +35,7 @@ if login.status_code == 200:
   sql = conn.cursor()
 
   # Create table
-  sql.execute('''CREATE TABLE IF NOT EXISTS odds (date text, data text)''')
+  sql.execute('''CREATE TABLE IF NOT EXISTS odds (timestamp text, event_id integer, event_tame text, market_id integer, market_name text, runner_id integer, runner_name text, type text, size real, price real )''')
 
 
   resp_json = login.json()
@@ -49,23 +49,33 @@ if login.status_code == 200:
   catalogs = betfair('listMarketCatalogue', {'filter': {'eventTypeIds': [61420], 'marketTypeCodes': ['MATCH_ODDS'] }, 'maxResults': 1000, 'marketProjection': ['EVENT', 'RUNNER_DESCRIPTION']}, headers )
   books = betfair('listMarketBook', {'marketIds': [c['marketId'] for c in catalogs], 'priceProjection': {'priceData': ['EX_BEST_OFFERS']} }, headers )
 
-  runnerIds = {r[0]['selectionId']:r[0]['runnerName'] for r in [c['runners'] for c in catalogs]}
+  runner_ids = {r[0]['selectionId']:r[0]['runnerName'] for r in [c['runners'] for c in catalogs]}
 
   # code.interact(local=locals())   
+  markets = {c['marketId']:c['marketName'] for c in catalogs}
   events = {c['event']['id']:c['event']['name'] for c in catalogs}
   event_ids = {c['marketId']:c['event']['id'] for c in catalogs}
   # runners = {c['runners'][:c['marketName'] for c in catalogs}
   runners = {}
   for c in catalogs: runners.update({r['selectionId']:r['runnerName'] for r in c['runners']})
   
-  data = {c['event']['id']:{'name':c['event']['name'], 'match_odds':{}} for c in catalogs}
-
   for b in books:
     for r in b['runners']:
-      data[event_ids[b['marketId']]]['match_odds'][runners[r['selectionId']]] = {'available_to_back':{'price': r['ex']['availableToBack'][0]['price'], 'size': r['ex']['availableToBack'][0]['size']}, 'available_to_lay':{'price': r['ex']['availableToLay'][0]['price'], 'size': r['ex']['availableToLay'][0]['size']}}
-
-  sql.execute("INSERT INTO odds VALUES (?,?)", (datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'), json.dumps(data)))
-  conn.commit()
+      timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+      event_id = event_ids[b['marketId']]
+      event_name = events[event_id]
+      market_id = b['marketId']
+      market_name = markets[market_id]
+      runner_id = r['selectionId']
+      runner_name = runners[runner_id]
+      for p in r['ex']['availableToBack']:
+        sql.execute("INSERT INTO odds VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (timestamp, event_id, event_name, market_id, market_name, runner_id, runner_name, 'BACK', p['size'], p['price']))
+        conn.commit()
+      for p in r['ex']['availableToLay']:
+        sql.execute("INSERT INTO odds VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (timestamp, event_id, event_name, market_id, market_name, runner_id, runner_name, 'LAY', p['size'], p['price']))
+        conn.commit()
+      
+  
   conn.close()
   logout = requests.post('https://identitysso.betfair.com/api/logout', headers={'X-Application': app_key, 'X-Authentication':session_token, 'Content-Type': 'application/json'})
 
