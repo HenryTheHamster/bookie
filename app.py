@@ -23,10 +23,10 @@ def betfair(command, paramaters, headers):
   return json.loads(response.text)
 
 
-catalog_filter = {'filter': {'eventTypeIds': [61420], #AFL
+catalog_filter = {'filter': {'eventTypeIds': [61420], #AFL, Politics
                              'marketTypeCodes': []}}
 
- 
+
 login = requests.post('https://identitysso.betfair.com/api/certlogin', data='username=sharkishki&password=ila2530rsmV', cert=('client-2048.crt', 'client-2048.key'), headers={'X-Application': app_key, 'Content-Type': 'application/x-www-form-urlencoded'})
 if login.status_code == 200:
 
@@ -46,7 +46,7 @@ if login.status_code == 200:
 
   headers = { 'X-Application' : app_key, 'X-Authentication' : session_token ,'content-type' : 'application/json' }
 
-  catalogs = betfair('listMarketCatalogue', {'filter': {'eventTypeIds': [61420], 'marketTypeCodes': ['MATCH_ODDS'] }, 'maxResults': 1000, 'marketProjection': ['EVENT', 'RUNNER_DESCRIPTION']}, headers )
+  catalogs = betfair('listMarketCatalogue', {'filter': {'eventTypeIds': [61420], 'marketTypeCodes': ['MATCH_ODDS'] }, 'maxResults': 1000, 'marketProjection': ['EVENT', 'RUNNER_DESCRIPTION']}, headers ) + betfair('listMarketCatalogue', {'filter': {'textQuery': 'australian','eventTypeIds': [2378961] }, 'maxResults': 1000, 'marketProjection': ['EVENT', 'RUNNER_DESCRIPTION']}, headers )
   books = betfair('listMarketBook', {'marketIds': [c['marketId'] for c in catalogs], 'priceProjection': {'priceData': ['EX_BEST_OFFERS']} }, headers )
 
   runner_ids = {r[0]['selectionId']:r[0]['runnerName'] for r in [c['runners'] for c in catalogs]}
@@ -76,6 +76,10 @@ if login.status_code == 200:
         conn.commit()
       
   
+  
+
+
+
   conn.close()
   logout = requests.post('https://identitysso.betfair.com/api/logout', headers={'X-Application': app_key, 'X-Authentication':session_token, 'Content-Type': 'application/json'})
 
