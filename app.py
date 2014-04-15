@@ -40,7 +40,7 @@ if login.status_code == 200:
 
   resp_json = login.json()
 
-
+  
 
   session_token = resp_json['sessionToken']
 
@@ -58,10 +58,10 @@ if login.status_code == 200:
   # runners = {c['runners'][:c['marketName'] for c in catalogs}
   runners = {}
   for c in catalogs: runners.update({r['selectionId']:r['runnerName'] for r in c['runners']})
-  
+  timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
   for b in books:
     for r in b['runners']:
-      timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+      
       event_id = event_ids[b['marketId']]
       event_name = events[event_id]
       market_id = b['marketId']
