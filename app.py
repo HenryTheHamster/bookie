@@ -27,7 +27,7 @@ catalog_filter = {'filter': {'eventTypeIds': [61420], #AFL, Politics
                              'marketTypeCodes': []}}
 
 
-login = requests.post('https://identitysso.betfair.com/api/certlogin', data='username=sharkishki&password=ila2530rsmV', cert=('client-2048.crt', 'client-2048.key'), headers={'X-Application': app_key, 'Content-Type': 'application/x-www-form-urlencoded'})
+login = requests.post('https://identitysso.betfair.com/api/certlogin', data='username=sharkishki&password=ila2530rsmV', cert=('client-2048.crt', 'client-2048.key'), headers={'X-Application': app_key, 'Content-Type': 'application/x-www-form-urlencoded'}, verify=False)
 if login.status_code == 200:
 
   conn = sqlite3.connect('odds.db')
