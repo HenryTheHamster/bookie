@@ -29,7 +29,7 @@ catalog_filter = {'filter': {'eventTypeIds': [61420], #AFL, Politics
 login = requests.post('https://identitysso.betfair.com/api/certlogin', data='username=sharkishki&password=ila2530rsmV', cert=("/home/andy/bookie/client-2048.crt", "/home/andy/bookie/client-2048.key"), headers={'X-Application': app_key, 'Content-Type': 'application/x-www-form-urlencoded'})
 if login.status_code == 200:
 
-  conn = sqlite3.connect('odds.db')
+  conn = sqlite3.connect('/home/andy/bookie/odds.db')
 
   sql = conn.cursor()
 
