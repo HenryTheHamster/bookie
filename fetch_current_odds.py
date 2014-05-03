@@ -58,22 +58,28 @@ if login.status_code == 200:
   runners = {}
   for c in catalogs: runners.update({r['selectionId']:r['runnerName'] for r in c['runners']})
   timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-  for b in books:
-    for r in b['runners']:
-      
-      event_id = event_ids[b['marketId']]
-      event_name = events[event_id]
-      market_id = b['marketId']
-      market_name = markets[market_id]
-      runner_id = r['selectionId']
-      runner_name = runners[runner_id]
-      for p in r['ex']['availableToBack']:
-        sql.execute("INSERT INTO odds VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (timestamp, event_id, event_name, market_id, market_name, runner_id, runner_name, 'BACK', p['size'], p['price']))
-        conn.commit()
-      for p in r['ex']['availableToLay']:
-        sql.execute("INSERT INTO odds VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (timestamp, event_id, event_name, market_id, market_name, runner_id, runner_name, 'LAY', p['size'], p['price']))
-        conn.commit()
-      
+
+  with open(time.strftime("%d%m%y") + '.csv', 'wb') as csvfile:
+    csvout = csv.writer(csvfile)
+
+    for b in books:
+      for r in b['runners']:
+        
+        event_id = event_ids[b['marketId']]
+        event_name = events[event_id]
+        market_id = b['marketId']
+        market_name = markets[market_id]
+        runner_id = r['selectionId']
+        runner_name = runners[runner_id]
+        for p in r['ex']['availableToBack']:
+          # sql.execute("INSERT INTO odds VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (timestamp, event_id, event_name, market_id, market_name, runner_id, runner_name, 'BACK', p['size'], p['price']))
+          csvout.writerow([timestamp, event_id, event_name, market_id, market_name, runner_id, runner_name, 'BACK', p['size'], p['price']])
+          # conn.commit()
+        for p in r['ex']['availableToLay']:
+          csvout.writerow([timestamp, event_id, event_name, market_id, market_name, runner_id, runner_name, 'BACK', p['size'], p['price']])
+          # sql.execute("INSERT INTO odds VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (timestamp, event_id, event_name, market_id, market_name, runner_id, runner_name, 'LAY', p['size'], p['price']))
+          # conn.commit()
+        
   
   
 

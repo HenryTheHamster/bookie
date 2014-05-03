@@ -1,0 +1,59 @@
+
+match
+  betfair_id
+  footywire_id
+  venue_id
+  starting_time
+  home_stat_id
+  away_stat_id
+
+betfair_price
+  match_id
+  team_id
+  type
+  price
+  size
+
+team_stat
+  team_id
+  player_stats
+
+player_stat
+  player_id
+  kicks
+  handballs
+  marks
+  tackles
+  goals
+  behinds
+  frees_for
+  frees_against
+  hitouts
+  inside_50s
+  contested_poss
+  uncontested_poss
+  effective_disposals
+  clangers
+  contested_marks
+  goal_assists
+  marks_inside_50
+  clearances
+  rebound_50s
+  one_percenters
+  bounces
+  tog
+
+venue
+  name
+  state
+
+team
+  footywire_id
+  footywire_name
+  betfair_name
+  betfair_id
+  state
+
+player
+  footywire_id
+  footywire_name
